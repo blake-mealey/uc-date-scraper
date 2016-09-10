@@ -12,7 +12,7 @@ function getRelevantColumns(table) {
 	for(var column in header) {
 		if(!header.hasOwnProperty(column)) { continue; }
 		var text = header[column];
-		if(column != "0" && text.indexOf("/")) == -1 {
+		if(column != "0" && text.indexOf("/") == -1) {
 			columns.push(column);
 		}
 	}
@@ -86,7 +86,7 @@ function addDate(dateType, columnData, date) {
 		columnData[dateType] = [];
 	}
 	columnData[dateType].push(date);
-	return columnData[dateType].length -
+	return columnData[dateType].length - 1;
 }
 
 function addEvent(columnData, event) {
