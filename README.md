@@ -11,17 +11,21 @@ The scraper outputs a .json file with the format:
 			"name": "Spring",
 			"year": "2016",
 			"start": {
+				"name": "Start of Classes",
+				"description": "Academic Dates",
 				"month": "07",
 				"day": "05"
 			},
 			"end": {
+				"name": "End of Classes",
+				"description": "Academic Dates",
 				"month": "08",
 				"day": "18"
 			},
 			"events": [
 				{
 					"name": "Start of Classes",
-					"description": "The first day of classes for the Spring 2016 semester",
+					"description": "Academic Dates",
 					"month": "07",
 					"day": "05"
 				},
