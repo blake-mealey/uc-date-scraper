@@ -12,7 +12,7 @@ function getRelevantColumns(table) {
 	for(var column in header) {
 		if(!header.hasOwnProperty(column)) { continue; }
 		var text = header[column];
-		if(column != "0" && !text.includes("/")) {
+		if(column != "0" && text.indexOf("/")) == -1 {
 			columns.push(column);
 		}
 	}
@@ -86,7 +86,7 @@ function addDate(dateType, columnData, date) {
 		columnData[dateType] = [];
 	}
 	columnData[dateType].push(date);
-	return columnData[dateType].length - 1;
+	return columnData[dateType].length -
 }
 
 function addEvent(columnData, event) {
@@ -101,34 +101,30 @@ function handleItem(key, value, columnData) {
 	var date = getDateData(value);
 	if(date === undefined) { return; }
 
-	var dateInfo = Object.assign({}, date);
-	dateInfo.name = key;
-	dateInfo.description = currentSection;
+	date.name = key;
+	date.description = currentSection;
 
 	if(currentSection == "Academic Dates") {
-		if(key.includes("Classes")) {
-			var index = addEvent(columnData, dateInfo);
-			if(key.includes("Start")) {
+		if(key.indexOf("Classes") != -1) {
+			var index = addEvent(columnData, date);
+			if(key.indexOf("Start") != -1) {
 				columnData.start = index;
-				// columnData.start = date;
-			} else if(key.includes("End")) {
+			} else if(key.indexOf("End") != -1) {
 				columnData.end = index;
-				// columnData.end = date;
 			}
 		}
-		// addEvent(columnData, dateInfo);
 	} else if(currentSection == "Registration Dates") {
-		addEvent(columnData, dateInfo);
+		addEvent(columnData, date);
 	} else if(currentSection == "Tuition and Refund Dates") {
-		addEvent(columnData, dateInfo);
+		addEvent(columnData, date);
 	} else if(currentSection == "Important Dates") {
-		/*if(key.includes("No Classes")) {
-			dateInfo.name = key.substring(0, key.indexOf(" - No Classes"));
+		/*if(key.indexOf("No Classes") != -1) {
+			date.name = key.substring(0, key.indexOf(" - No Classes"));
 			addHoliday(columnData, date);
 		}
-		addEvent(columnDate, dateInfo);*/
+		addEvent(columnDate, date);*/
 	} else if(currentSection == "Recognized Holidays (university closed)") {
-		var index = addEvent(columnData, dateInfo);
+		var index = addEvent(columnData, date);
 		addHoliday(columnData, index);
 	}
 }
