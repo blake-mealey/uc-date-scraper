@@ -100,8 +100,9 @@ function handleItem(key, value, columnData) {
 	var date = getDateData(value);
 	if(date === undefined) { return; }
 
-	date.name = key;
-	date.description = currentSection;
+	var dateInfo = Object.assign({}, date);
+	dateInfo.name = key;
+	dateInfo.description = currentSection;
 
 	if(currentSection == "Academic Dates") {
 		if(key.includes("Classes")) {
@@ -111,20 +112,20 @@ function handleItem(key, value, columnData) {
 				columnData.end = date;
 			}
 		}
-		addEvent(columnData, date);
+		addEvent(columnData, dateInfo);
 	} else if(currentSection == "Registration Dates") {
-		addEvent(columnData, date);
+		addEvent(columnData, dateInfo);
 	} else if(currentSection == "Tuition and Refund Dates") {
-		addEvent(columnData, date);
+		addEvent(columnData, dateInfo);
 	} else if(currentSection == "Important Dates") {
 		/*if(key.includes("No Classes")) {
-			date.name = key.substring(0, key.indexOf(" - No Classes"));
+			dateInfo.name = key.substring(0, key.indexOf(" - No Classes"));
 			addHoliday(columnData, date);
-		} else {
-			addEvent(columnData, date);
-		}*/
+		}
+		addEvent(columnDate, dateInfo);*/
 	} else if(currentSection == "Recognized Holidays (university closed)") {
 		addHoliday(columnData, date);
+		addEvent(columnData, dateInfo);
 	}
 }
 

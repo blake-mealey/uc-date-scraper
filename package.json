@@ -1,6 +1,6 @@
 {
   "name": "uc-date-scraper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "This is just a simple scraper for [this UofC schedule site](https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html), which I use to populate calendars with my [UofC Schedule to Google Calendar](http://schedule.blakemealey.ca) app.",
   "main": "scraper.js",
   "scripts": {
