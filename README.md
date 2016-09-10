@@ -4,7 +4,7 @@ This is just a simple scraper for [this UofC schedule site](https://www.ucalgary
 
 ## Format
 
-The scraper outputs a .json file with the format:
+This scraper can be simply run to produce a .json file with the format:
 
 	[
 		{
@@ -43,6 +43,19 @@ The scraper outputs a .json file with the format:
 		},
 		...
 	]
+
+## Usage
+
+Or, you can install and require this package with npm.
+
+	npm install --save uc-date-scraper
+
+Then in your code:
+
+	var scraper = require('uc-date-scraper');
+	scraper(null, function(semesters) {
+		// do stuff with semesters
+	});
 
 ## Run
 

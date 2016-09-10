@@ -1,17 +1,17 @@
 // get libraries
-let request = require('request');
-let tabletojson = require('tabletojson');
-let cheerio = require('cheerio');
-let fs = require('fs');
+var request = require('request');
+var tabletojson = require('tabletojson');
+var cheerio = require('cheerio');
+var fs = require('fs');
 
-let url = "https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html";
+var url = "https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html";
 
 function getRelevantColumns(table) {
-	let columns = [];
-	let header = table[0];
-	for(let column in header) {
+	var columns = [];
+	var header = table[0];
+	for(var column in header) {
 		if(!header.hasOwnProperty(column)) { continue; }
-		let text = header[column];
+		var text = header[column];
 		if(column != "0" && !text.includes("/")) {
 			columns.push(column);
 		}
@@ -19,21 +19,21 @@ function getRelevantColumns(table) {
 	return columns;
 }
 
-let semesters = null;
-let currentSection = null;
-let data = null;
+var semesters = null;
+var currentSection = null;
+var data = null;
 
 function handleTable(table) {
 	data = {};
-	let relevantColumns = getRelevantColumns(table);
-	for(let i = 1; i < table.length; i++) {
+	var relevantColumns = getRelevantColumns(table);
+	for(var i = 1; i < table.length; i++) {
 		handleRow(table[i], relevantColumns);
 	}
 
-	for(let column in data) {
+	for(var column in data) {
 		if(!data.hasOwnProperty(column)) { continue; }
-		let columnData = data[column];
-		let columnName = table[0][column];
+		var columnData = data[column];
+		var columnName = table[0][column];
 		columnData.name = columnName.match(/(Spring|Summer|Fall|Winter)/g)[0];
 		columnData.year = columnName.match(/\d+/)[0];
 		semesters.push(columnData);
@@ -49,9 +49,9 @@ function handleRow(row, relevantColumns) {
 }
 
 function handleDataRow(row, relevantColumns) {
-	let name = row["0"];
-	for(let i = 0; i < relevantColumns.length; i++) {
-		let column = relevantColumns[i];
+	var name = row["0"];
+	for(var i = 0; i < relevantColumns.length; i++) {
+		var column = relevantColumns[i];
 		if(data[column] === undefined) {
 			data[column] = {};
 		}
@@ -72,7 +72,7 @@ function pad(n, width, z) {
 }
 
 function getDateData(text) {
-	let dateInfo = text.split(/\W+/);
+	var dateInfo = text.split(/\W+/);
 	if(dateInfo.length === 3 && Number(dateInfo[2]) !== null) {
 		return {
 			"month": pad(getMonth(dateInfo[1]), 2),
@@ -97,7 +97,7 @@ function addHoliday(columnData, event) {
 }
 
 function handleItem(key, value, columnData) {
-	let date = getDateData(value);
+	var date = getDateData(value);
 	if(date === undefined) { return; }
 
 	date.name = key;
@@ -128,7 +128,7 @@ function handleItem(key, value, columnData) {
 	}
 }
 
-let logging = false;
+var logging = false;
 function log(text) {
 	if(logging) {
 		console.log(text);
@@ -151,18 +151,18 @@ module.exports = function(outputFileName, callback, logEnabled) {
 		log("Finished getting webpage.");
 		log("Parsing HTML for tables.");
 
-		let $ = cheerio.load(body);
+		var $ = cheerio.load(body);
 
-		let $tables = $("<div>");
+		var $tables = $("<div>");
 		$(".tftable").each(function() {
 			$tables.append($(this));
 		});
-		let tables = tabletojson.convert($tables.html());
+		var tables = tabletojson.convert($tables.html());
 
 		log("Handling table data.");
 
 		semesters = [];
-		for(let i = 0; i < tables.length; i++) {
+		for(var i = 0; i < tables.length; i++) {
 			handleTable(tables[i]);
 		}
 
