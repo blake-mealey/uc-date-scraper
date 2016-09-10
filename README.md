@@ -49,6 +49,6 @@ The scraper outputs a .json file with the format:
 If you have nodejs/npm installed, download the project and cd into it. Then run the following commands:
 
 	npm install
-	node --use_strict scraper.js
+	npm start
 
 A `semesters.json` file should be generated in the project directory.
