@@ -5,6 +5,7 @@ let cheerio = require('cheerio');
 let fs = require('fs');
 
 let url = "https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html";
+let outputFileName = "semesters.json";
 
 function getRelevantColumns(table) {
 	let columns = [];
@@ -128,6 +129,8 @@ function handleItem(key, value, columnData) {
 	}
 }
 
+console.log("Starting scraper. Getting webpage.");
+
 request({
 	uri: url,
 	method: "GET"
@@ -138,7 +141,8 @@ request({
 	}
 
 	console.log("Finished getting webpage.");
-	console.log("\nParsing webpage.");
+
+	console.log("Parsing HTML for tables.");
 
 	let $ = cheerio.load(body);
 
@@ -148,9 +152,16 @@ request({
 	});
 	let tables = tabletojson.convert($tables.html());
 
+	console.log("Handling table data.");
+
 	semesters = [];
 	for(let i = 0; i < tables.length; i++) {
 		handleTable(tables[i]);
 	}
-	fs.writeFile("semesters.json", JSON.stringify(semesters, null, 2), "utf8");
+
+	console.log("Saving data to " + outputFileName + ".");
+
+	fs.writeFile(outputFileName, JSON.stringify(semesters, null, 2), "utf8");
+
+	console.log("Done.");
 });
