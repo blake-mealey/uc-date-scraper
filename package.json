@@ -1,15 +1,25 @@
 {
-  "name": "uofc-date-scraper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "uc-date-scraper",
+  "version": "1.0.1",
+  "description": "This is just a simple scraper for [this UofC schedule site](https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html), which I use to populate calendars with my [UofC Schedule to Google Calendar](http://schedule.blakemealey.ca) app.",
+  "main": "scraper.js",
   "scripts": {
-    "start": "node --use_strict scraper.js"
+    "start": "node --use_strict run.js"
   },
-  "author": "",
   "dependencies": {
     "cheerio": "^0.22.0",
     "request": "^2.74.0",
     "tabletojson": "^0.4.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blake-mealey/uc-date-scraper.git"
+  },
+  "author": "Blake Mealey <blakemealey@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blake-mealey/uc-date-scraper/issues"
+  },
+  "homepage": "https://github.com/blake-mealey/uc-date-scraper#readme"
 }

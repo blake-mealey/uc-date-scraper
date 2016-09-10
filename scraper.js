@@ -5,7 +5,6 @@ let cheerio = require('cheerio');
 let fs = require('fs');
 
 let url = "https://www.ucalgary.ca/pubs/calendar/current/academic-schedule.html";
-let outputFileName = "semesters.json";
 
 function getRelevantColumns(table) {
 	let columns = [];
@@ -129,39 +128,55 @@ function handleItem(key, value, columnData) {
 	}
 }
 
-console.log("Starting scraper. Getting webpage.");
-
-request({
-	uri: url,
-	method: "GET"
-}, function(err, res, body) {
-	if(err || res.statusCode != 200) {
-		console.log("Error occured: " + err);
-		return;
+let logging = false;
+function log(text) {
+	if(logging) {
+		console.log(text);
 	}
+}
 
-	console.log("Finished getting webpage.");
+module.exports = function(outputFileName, callback, logEnabled) {
+	logging = logEnabled;
+	log("Starting scraper. Getting webpage.");
 
-	console.log("Parsing HTML for tables.");
+	request({
+		uri: url,
+		method: "GET"
+	}, function(err, res, body) {
+		if(err || res.statusCode != 200) {
+			console.log("Error occured: " + err);
+			return;
+		}
 
-	let $ = cheerio.load(body);
+		log("Finished getting webpage.");
+		log("Parsing HTML for tables.");
 
-	let $tables = $("<div>");
-	$(".tftable").each(function() {
-		$tables.append($(this));
+		let $ = cheerio.load(body);
+
+		let $tables = $("<div>");
+		$(".tftable").each(function() {
+			$tables.append($(this));
+		});
+		let tables = tabletojson.convert($tables.html());
+
+		log("Handling table data.");
+
+		semesters = [];
+		for(let i = 0; i < tables.length; i++) {
+			handleTable(tables[i]);
+		}
+
+		log("Saving data to " + outputFileName + ".");
+
+
+		if(outputFileName !== undefined && outputFileName !== null) {
+			fs.writeFile(outputFileName, JSON.stringify(semesters, null, 2), "utf8");
+		}
+
+		log("Done.");
+
+		if(callback !== undefined && callback !== null) {
+			callback(semesters);
+		}
 	});
-	let tables = tabletojson.convert($tables.html());
-
-	console.log("Handling table data.");
-
-	semesters = [];
-	for(let i = 0; i < tables.length; i++) {
-		handleTable(tables[i]);
-	}
-
-	console.log("Saving data to " + outputFileName + ".");
-
-	fs.writeFile(outputFileName, JSON.stringify(semesters, null, 2), "utf8");
-
-	console.log("Done.");
-});
+};

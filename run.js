@@ -1,0 +1,1 @@
+require("./scraper")("semesters.json", null, true);
