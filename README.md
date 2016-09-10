@@ -34,7 +34,7 @@ The scraper outputs a .json file with the format:
 			"holidays": [
 				{
 					"name": "Victoria Day",
-					"description": "Recognized holiday (university closed)",
+					"description": "Recognized Holidays (university closed)",
 					"month": "05",
 					"day": "23"
 				},
