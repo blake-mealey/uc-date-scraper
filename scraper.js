@@ -86,14 +86,15 @@ function addDate(dateType, columnData, date) {
 		columnData[dateType] = [];
 	}
 	columnData[dateType].push(date);
+	return columnData[dateType].length - 1;
 }
 
 function addEvent(columnData, event) {
-	addDate("events", columnData, event);
+	return addDate("events", columnData, event);
 }
 
 function addHoliday(columnData, event) {
-	addDate("holidays", columnData, event);
+	return addDate("holidays", columnData, event);
 }
 
 function handleItem(key, value, columnData) {
@@ -106,13 +107,16 @@ function handleItem(key, value, columnData) {
 
 	if(currentSection == "Academic Dates") {
 		if(key.includes("Classes")) {
+			var index = addEvent(columnData, dateInfo);
 			if(key.includes("Start")) {
-				columnData.start = date;
+				columnData.start = index;
+				// columnData.start = date;
 			} else if(key.includes("End")) {
-				columnData.end = date;
+				columnData.end = index;
+				// columnData.end = date;
 			}
 		}
-		addEvent(columnData, dateInfo);
+		// addEvent(columnData, dateInfo);
 	} else if(currentSection == "Registration Dates") {
 		addEvent(columnData, dateInfo);
 	} else if(currentSection == "Tuition and Refund Dates") {
@@ -124,8 +128,8 @@ function handleItem(key, value, columnData) {
 		}
 		addEvent(columnDate, dateInfo);*/
 	} else if(currentSection == "Recognized Holidays (university closed)") {
-		addHoliday(columnData, date);
-		addEvent(columnData, dateInfo);
+		var index = addEvent(columnData, dateInfo);
+		addHoliday(columnData, index);
 	}
 }
 

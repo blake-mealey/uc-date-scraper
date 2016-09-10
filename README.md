@@ -10,14 +10,8 @@ This scraper can be simply run to produce a .json file with the format:
 		{
 			"name": "Spring",
 			"year": "2016",
-			"start": {
-				"month": "07",
-				"day": "05"
-			},
-			"end": {
-				"month": "08",
-				"day": "18"
-			},
+			"start": 0,
+			"end": 1,
 			"events": [
 				{
 					"name": "Start of Classes",
@@ -25,6 +19,12 @@ This scraper can be simply run to produce a .json file with the format:
 					"month": "07",
 					"day": "05"
 				},
+				{
+					"name": "End of Classes",
+					"description": "Academic Dates",
+					"month": "12",
+					"day": "08"
+				}
 				{
 					"name": "Victoria Day",
 					"description": "Recognized Holidays (university closed)",
@@ -34,11 +34,7 @@ This scraper can be simply run to produce a .json file with the format:
 				...
 			],
 			"holidays": [
-				{
-					"month": "05",
-					"day": "23"
-				},
-				...
+				2, ...
 			]
 		},
 		...
