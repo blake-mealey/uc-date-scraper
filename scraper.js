@@ -107,7 +107,7 @@ function getDateData(text) {
 		var singleDayMatch = text.match(SINGLE_DAY_MATCHER);
 		if (singleDayMatch) {
 			var day = pad(Number(singleDayMatch[SINGLE_DAY_GROUPS.day]), 2);
-			return createDate(getMonth(multiDayMatch[SINGLE_DAY_GROUPS.month]), day, day);
+			return createDate(getMonth(singleDayMatch[SINGLE_DAY_GROUPS.month]), day, day);
 		}
 	}
 }
