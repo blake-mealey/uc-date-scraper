@@ -104,13 +104,20 @@ function handleItem(key, value, columnData) {
 	date.name = key;
 	date.description = currentSection;
 
+	var index;
 	if(currentSection == "Academic Dates") {
+		index = addEvent(columnData, date);
 		if(key.indexOf("Classes") != -1) {
-			var index = addEvent(columnData, date);
 			if(key.indexOf("Start") != -1) {
-				columnData.start = index;
+				columnData.startClasses = index;
 			} else if(key.indexOf("End") != -1) {
-				columnData.end = index;
+				columnData.endClasses = index;
+			}
+		} else if (key.indexOf("Term") != -1) {
+			if (key.indexOf("Start") != -1) {
+				columnData.startTerm = index;
+			} else if (key.indexOf("End") != -1) {
+				columnData.endTerm = index;
 			}
 		}
 	} else if(currentSection == "Registration Dates") {
@@ -124,7 +131,7 @@ function handleItem(key, value, columnData) {
 		}
 		addEvent(columnDate, date);*/
 	} else if(currentSection == "Recognized Holidays (university closed)") {
-		var index = addEvent(columnData, date);
+		index = addEvent(columnData, date);
 		addHoliday(columnData, index);
 	}
 }
