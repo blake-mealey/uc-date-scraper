@@ -23,11 +23,11 @@ var semesters = null;
 var currentSection = null;
 var data = null;
 
-function handleTable(table) {
+function handleTable(table, paragraphs) {
 	data = {};
 	var relevantColumns = getRelevantColumns(table);
 	for(var i = 1; i < table.length; i++) {
-		handleRow(table[i], relevantColumns);
+		handleRow(table[i], relevantColumns, paragraphs);
 	}
 
 	for(var column in data) {
@@ -40,22 +40,22 @@ function handleTable(table) {
 	}
 }
 
-function handleRow(row, relevantColumns) {
+function handleRow(row, relevantColumns, paragraphs) {
 	if(Object.keys(row).length == 1) {
 		currentSection = row["0"];
 	} else {
-		handleDataRow(row, relevantColumns);
+		handleDataRow(row, relevantColumns, paragraphs);
 	}
 }
 
-function handleDataRow(row, relevantColumns) {
+function handleDataRow(row, relevantColumns, paragraphs) {
 	var name = row["0"];
 	for(var i = 0; i < relevantColumns.length; i++) {
 		var column = relevantColumns[i];
 		if(data[column] === undefined) {
 			data[column] = {};
 		}
-		handleItem(name, row[column], data[column]);
+		handleItem(name, row[column], data[column], paragraphs);
 	}
 }
 
@@ -64,11 +64,9 @@ function getMonth(monthStr){
 	return new Date(monthStr+'-1-01').getMonth() + 1;
 }
 
-// https://stackoverflow.com/questions/10073699/pad-a-number-with-leading-zeros-in-javascript
-function pad(n, width, z) {
-	z = z || '0';
-	n = n + '';
-	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+function pad2(num) {
+	var str = ("0" + num);
+	return str.substr(str.length - 2, 2);
 }
 
 const MULTI_DAY_MATCHER = /(\w+)-(\w+), (\w+) ([0-9]{1,2})-([0-9]{1,2})/;
@@ -85,14 +83,19 @@ const SINGLE_DAY_GROUPS = {
 };
 
 function createDate(month, dayStart, dayEnd) {
+	var arbitraryYear = 2017;
+	var endDate = new Date(arbitraryYear, month - 1, dayEnd);
+	endDate.setDate(endDate.getDate() + 1);
 	var date = {
-		month: pad(month, 2),
-		dayStart: pad(dayStart, 2),
-		dayEnd: pad(dayEnd, 2),
+		monthStart: pad2(month),
+		monthEnd: pad2(endDate.getMonth() + 1),
+		yearEndOffset: endDate.getFullYear() - arbitraryYear,
+		dayStart: pad2(dayStart),
+		dayEnd: pad2(endDate.getDate()),
 		days: []
 	};
 	for (var day = dayStart; day <= dayEnd; day++) {
-		date.days.push(pad(day, 2));
+		date.days.push(pad2(day));
 	}
 	return date;
 }
@@ -106,7 +109,7 @@ function getDateData(text) {
 	} else {
 		var singleDayMatch = text.match(SINGLE_DAY_MATCHER);
 		if (singleDayMatch) {
-			var day = pad(Number(singleDayMatch[SINGLE_DAY_GROUPS.day]), 2);
+			var day = pad2(Number(singleDayMatch[SINGLE_DAY_GROUPS.day]));
 			return createDate(getMonth(singleDayMatch[SINGLE_DAY_GROUPS.month]), day, day);
 		}
 	}
@@ -128,7 +131,7 @@ function addHoliday(columnData, event) {
 	return addDate("holidays", columnData, event);
 }
 
-function handleItem(key, value, columnData) {
+function handleItem(key, value, columnData, paragraphs) {
 	var date = getDateData(value);
 	if(date === undefined) { return; }
 
@@ -151,19 +154,22 @@ function handleItem(key, value, columnData) {
 				columnData.endTerm = index;
 			}
 		}
-	} else if(currentSection == "Registration Dates") {
-		addEvent(columnData, date);
-	} else if(currentSection == "Tuition and Refund Dates") {
-		addEvent(columnData, date);
-	} else if(currentSection == "Important Dates") {
-		/*if(key.indexOf("No Classes") != -1) {
-			date.name = key.substring(0, key.indexOf(" - No Classes"));
-			addHoliday(columnData, date);
+		if (key.indexOf("Break") != -1) {
+			addHoliday(columnData, index);
 		}
-		addEvent(columnDate, date);*/
 	} else if(currentSection == "Recognized Holidays (university closed)") {
 		index = addEvent(columnData, date);
 		addHoliday(columnData, index);
+	} else if(currentSection == "Registration Dates" || currentSection == "Tuition and Refund Dates" || currentSection == "Important Dates") {
+		var asterixMatch = key.match(/([^*]+)(\*+)/);
+		if (asterixMatch) {
+			date.name = asterixMatch[1];
+			var descriptionMatch = paragraphs.match(new RegExp("^\\*{" + asterixMatch[2].length + "}([^\n\r*]+)", "m"));
+			if (descriptionMatch) {
+				date.description = descriptionMatch[1].trim();
+			}
+		}
+		addEvent(columnData, date);
 	}
 }
 
@@ -192,6 +198,11 @@ module.exports = function(outputFileName, callback, logEnabled) {
 
 		var $ = cheerio.load(body);
 
+		var paragraphs = "";
+		$("p").each(function() {
+			paragraphs += $("<div/>").html(($(this).html().replace(/<br\/?>/, "\n"))).text() + "\n";
+		});
+
 		var $tables = $("<div>");
 		$(".tftable").each(function() {
 			$tables.append($(this));
@@ -202,7 +213,7 @@ module.exports = function(outputFileName, callback, logEnabled) {
 
 		semesters = [];
 		for(var i = 0; i < tables.length; i++) {
-			handleTable(tables[i]);
+			handleTable(tables[i], paragraphs);
 		}
 
 		log("Saving data to " + outputFileName + ".");
