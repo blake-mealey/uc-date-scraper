@@ -71,13 +71,44 @@ function pad(n, width, z) {
 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
+const MULTI_DAY_MATCHER = /(\w+)-(\w+), (\w+) ([0-9]{1,2})-([0-9]{1,2})/;
+const MULTI_DAY_GROUPS = {
+	month: 3,
+	dayStart: 4,
+	dayEnd: 5
+};
+
+const SINGLE_DAY_MATCHER = /(\w+), (\w+) ([0-9]{1,2})/;
+const SINGLE_DAY_GROUPS = {
+	month: 2,
+	day: 3
+};
+
+function createDate(month, dayStart, dayEnd) {
+	var date = {
+		month: pad(month, 2),
+		dayStart: pad(dayStart, 2),
+		dayEnd: pad(dayEnd, 2),
+		days: []
+	};
+	for (var day = dayStart; day <= dayEnd; day++) {
+		date.days.push(pad(day, 2));
+	}
+	return date;
+}
+
 function getDateData(text) {
-	var dateInfo = text.split(/\W+/);
-	if(dateInfo.length === 3 && Number(dateInfo[2]) !== null) {
-		return {
-			"month": pad(getMonth(dateInfo[1]), 2),
-			"day": pad(Number(dateInfo[2]), 2)
-		};
+	var multiDayMatch = text.match(MULTI_DAY_MATCHER);
+	if (multiDayMatch) {
+		return createDate(getMonth(multiDayMatch[MULTI_DAY_GROUPS.month]),
+			Number(multiDayMatch[MULTI_DAY_GROUPS.dayStart]),
+			Number(multiDayMatch[MULTI_DAY_GROUPS.dayEnd]));
+	} else {
+		var singleDayMatch = text.match(SINGLE_DAY_MATCHER);
+		if (singleDayMatch) {
+			var day = pad(Number(singleDayMatch[SINGLE_DAY_GROUPS.day]), 2);
+			return createDate(getMonth(multiDayMatch[SINGLE_DAY_GROUPS.month]), day, day);
+		}
 	}
 }
 
